@@ -4,16 +4,20 @@ import(
 	"encoding/csv"
 	"fmt"
 	"os"
+	"flag"
 )
 
 var(
-	filename string = "problems.csv"
 	score int = 0
 )
 
 func main() {
+	// Setting the problem file
+	filename := flag.String("csv", "problems.csv", "a csv file in format of 'question,answer'")
+	flag.Parse()
+
 	// Opening the problems file
-	csvFile, err := os.Open(filename)
+	csvFile, err := os.Open(*filename)
 	if err != nil {
 		fmt.Println(err)
 	}
