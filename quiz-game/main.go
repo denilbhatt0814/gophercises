@@ -25,8 +25,8 @@ func main() {
 	// Asking the problems
 	qno := 0
 	for _, problem := range csvLines {
-		fmt.Printf(problem[0] + " = ")
 		qno++ // increasingt the no. of Q count
+		fmt.Printf("Problem #%d: %s = ", qno,problem[0])
 		var ans string
 		fmt.Scanf("%s\n",&ans)
 
@@ -36,5 +36,5 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Score: %d/%d \n", score, qno)
+	fmt.Printf("You scored %d of %d.\n", score, qno)
 }
