@@ -7,9 +7,22 @@ import(
 	"flag"
 )
 
-var(
-	score int = 0
-)
+type problem struct {
+	ques string
+	ans	 string
+}
+
+func parseProblem(lines [][]string) []problem {
+	set := make([]problem, len(lines))
+	for i, line := range lines{
+		set[i] = problem{
+			ques: line[0],
+			ans: line[1],
+		}
+	}
+	return set
+}
+
 
 func main() {
 	// Setting the problem file
@@ -25,20 +38,20 @@ func main() {
 
 	// Read the problems
 	csvLines, err := csv.NewReader(csvFile).ReadAll()
+	problems := parseProblem(csvLines)
 
 	// Asking the problems
-	qno := 0
-	for _, problem := range csvLines {
-		qno++ // increasingt the no. of Q count
-		fmt.Printf("Problem #%d: %s = ", qno,problem[0])
+	score := 0
+	for i, problem := range problems {
+		fmt.Printf("Problem #%d: %s = ", i+1, problem.ques)
 		var ans string
 		fmt.Scanf("%s\n",&ans)
 
 		// Validating ans and scoring
-		if ans == problem[1]{
+		if ans == problem.ans {
 			score++ // increasing score
 		}
 	}
-
-	fmt.Printf("You scored %d of %d.\n", score, qno)
+	
+	fmt.Printf("You scored %d of %d.\n", score, len(problems))
 }
