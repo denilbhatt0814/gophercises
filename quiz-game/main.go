@@ -5,6 +5,7 @@ import(
 	"fmt"
 	"os"
 	"flag"
+	"time"
 )
 
 type problem struct {
@@ -27,6 +28,7 @@ func parseProblem(lines [][]string) []problem {
 func main() {
 	// Setting the problem file
 	filename := flag.String("csv", "problems.csv", "a csv file in format of 'question,answer'")
+	timeLimit := flag.Int("limit", 30, "the time limit for quiz in seconds")
 	flag.Parse()
 
 	// Opening the problems file
@@ -40,18 +42,42 @@ func main() {
 	csvLines, err := csv.NewReader(csvFile).ReadAll()
 	problems := parseProblem(csvLines)
 
+	// Declaring & initailzing a timer
+	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
+
 	// Asking the problems
 	score := 0
+	t := time.Now()
 	for i, problem := range problems {
 		fmt.Printf("Problem #%d: %s = ", i+1, problem.ques)
-		var ans string
-		fmt.Scanf("%s\n",&ans)
 
-		// Validating ans and scoring
-		if ans == problem.ans {
-			score++ // increasing score
+		// Making a channel to recieve ans from diff. goroutine
+		answerChan := make(chan string)
+		go func() {
+			/*This is go routine so that scanf doesn't 
+				block the main goroutine which has a timer running*/
+			var answer string
+			fmt.Scanf("%s\n", &answer)
+			answerChan <- answer
+		}()
+
+		select{
+			/* This select waits for either of response (since no default declared)*/
+		case <- timer.C:
+			/* If the timer ends*/
+			fmt.Printf("\nTime is up!!")
+			fmt.Printf("\nYou scored %d of %d.\n", score, len(problems))
+			fmt.Printf("You took %s\n", time.Since(t))
+			return
+		case answer := <- answerChan:
+			/* If ans submited before timer ends */
+			// Validating ans and scoring
+			if answer == problem.ans {
+				score++ // increasing score
+			}				
 		}
 	}
 	
 	fmt.Printf("You scored %d of %d.\n", score, len(problems))
+	fmt.Printf("You took %s\n", time.Since(t))
 }
