@@ -6,6 +6,7 @@ import(
 	"os"
 	"flag"
 	"time"
+	"strings"
 )
 
 type problem struct {
@@ -18,7 +19,7 @@ func parseProblem(lines [][]string) []problem {
 	for i, line := range lines{
 		set[i] = problem{
 			ques: line[0],
-			ans: line[1],
+			ans: strings.TrimSpace(line[1]),
 		}
 	}
 	return set
