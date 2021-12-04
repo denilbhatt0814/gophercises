@@ -6,7 +6,7 @@ import(
 	"os"
 	"flag"
 	"time"
-	"strings"
+	"math/rand"
 )
 
 type problem struct {
@@ -19,7 +19,7 @@ func parseProblem(lines [][]string) []problem {
 	for i, line := range lines{
 		set[i] = problem{
 			ques: line[0],
-			ans: strings.TrimSpace(line[1]),
+			ans: line[1],
 		}
 	}
 	return set
@@ -30,6 +30,7 @@ func main() {
 	// Setting the problem file
 	filename := flag.String("csv", "problems.csv", "a csv file in format of 'question,answer'")
 	timeLimit := flag.Int("limit", 30, "the time limit for quiz in seconds")
+	shuffle := flag.Bool("shuffle", true, "shuffles the question sequence from csv")
 	flag.Parse()
 
 	// Opening the problems file
@@ -42,6 +43,14 @@ func main() {
 	// Read the problems
 	csvLines, err := csv.NewReader(csvFile).ReadAll()
 	problems := parseProblem(csvLines)
+
+	// If asked to shuffle (flag)
+	if *shuffle{
+		/* Shuffles the problem-set sequence using math/rand */
+		rand.Shuffle(len(problems), func(i, j int){
+			problems[i], problems[j] = problems[j], problems[i]
+		})
+	}
 
 	// Declaring & initailzing a timer
 	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
